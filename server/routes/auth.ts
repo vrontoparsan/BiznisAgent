@@ -45,6 +45,27 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// One-time setup: create superadmin if not exists
+router.get('/setup-superadmin', async (req, res) => {
+  try {
+    const [existing] = await db.select().from(users).where(eq(users.email, 'superadmin@biznisagent.sk')).limit(1);
+    if (existing) {
+      return res.json({ message: 'Superadmin already exists', id: existing.id });
+    }
+    const hash = await bcrypt.hash('superadmin123', 10);
+    const [user] = await db.insert(users).values({
+      email: 'superadmin@biznisagent.sk',
+      passwordHash: hash,
+      name: 'Super Admin',
+      role: 'superadmin',
+    }).returning();
+    res.json({ message: 'Superadmin created', id: user.id });
+  } catch (error) {
+    console.error('Setup error:', error);
+    res.status(500).json({ error: 'Setup failed', details: String(error) });
+  }
+});
+
 router.get('/me', async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
