@@ -81,6 +81,9 @@ export function Sidebar({ activeModule, setActiveModule }: SidebarProps) {
           <LogOut className="w-5 h-5 mr-3" />
           Odhlásiť sa
         </Button>
+        <div className="pt-2 text-center text-xs text-muted-foreground">
+          ⌨️ Skratky: N=nový, C=CP, F=FA, /=hľadať
+        </div>
       </div>
     </>
   );

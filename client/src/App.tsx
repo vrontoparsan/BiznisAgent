@@ -1,6 +1,6 @@
 import { useAuth } from './contexts/AuthContext';
 import { Layout } from './components/layout/Layout';
-import { Login } from './components/Login';
+import { Landing } from './components/Landing';
 
 function App() {
   const { user, loading } = useAuth();
@@ -17,7 +17,7 @@ function App() {
   }
 
   if (!user) {
-    return <Login />;
+    return <Landing />;
   }
 
   return <Layout />;

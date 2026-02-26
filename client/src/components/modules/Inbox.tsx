@@ -16,6 +16,8 @@ export function Inbox() {
   const [loading, setLoading] = useState(true);
   const [configOpen, setConfigOpen] = useState(false);
   const [actionOutput, setActionOutput] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [showReplies, setShowReplies] = useState(false);
 
   useEffect(() => {
     if (token) {
@@ -318,6 +320,77 @@ Agent overil: Dodávateľ je evidovaný v registri, IČO a DIČ je správne`;
 
   const aiActions = selectedEmail ? getAIActions(selectedEmail) : [];
 
+  const toggleSelection = (id: number) => {
+    const newSelected = new Set(selectedIds);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedIds(newSelected);
+  };
+
+  const selectAll = () => {
+    if (selectedIds.size === emails.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(emails.map(e => e.id)));
+    }
+  };
+
+  const handleBulkAction = (action: string) => {
+    alert(`Agent spracuje ${selectedIds.size} emailov: ${action}`);
+    setSelectedIds(new Set());
+  };
+
+  const smartReplies = [
+    {
+      type: 'formal',
+      preview: 'Ďakujeme za dopyt. Zasielame cenovú ponuku...',
+      full: `Vážený pán/pani,
+
+ďakujeme za Váš dopyt. V prílohe zasielame požadovanú cenovú ponuku. Všetky položky sú momentálne skladom a pripravené na okamžité dodanie.
+
+Platnosť ponuky je 30 dní. V prípade akýchkoľvek otázok nás neváhajte kontaktovať.
+
+S pozdravom,
+Obchodné oddelenie`
+    },
+    {
+      type: 'concise',
+      preview: 'Dobrý deň, ceny a dostupnosť nájdete v prílohe...',
+      full: `Dobrý deň,
+
+ceny a dostupnosť požadovaných položiek nájdete v prílohe.
+
+Všetko skladom, dodanie do 3 dní.
+
+S pozdravom`
+    },
+    {
+      type: 'detailed',
+      preview: 'Na základe Vášho dopytu sme pripravili...',
+      full: `Vážený pán/pani,
+
+na základe Vášho dopytu sme pripravili kompletnú cenovú ponuku vrátane:
+
+• Podrobného cenového rozpisu všetkých položiek
+• Informácií o dostupnosti a dodacích termínoch
+• Technických špecifikácií a certifikátov
+• Platobných a dodacích podmienok
+
+V prílohe nájdete:
+1. Cenovú ponuku (PDF)
+2. Technickú dokumentáciu (PDF)
+3. Dodacie podmienky (PDF)
+
+Platnosť ponuky je 30 dní. Sme pripravení kedykoľvek poskytnúť ďalšie informácie alebo sa stretnúť osobne.
+
+S pozdravom,
+Obchodné oddelenie`
+    }
+  ];
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -337,6 +410,37 @@ Agent overil: Dodávateľ je evidovaný v registri, IČO a DIČ je správne`;
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-3">
+          {selectedIds.size > 0 && (
+            <Card className="bg-primary/10 border-primary/20">
+              <CardContent className="p-4 flex items-center justify-between">
+                <span className="font-medium">Vybrané: {selectedIds.size}</span>
+                <div className="flex gap-2">
+                  <Button size="sm" variant="default" onClick={() => handleBulkAction('process_all')}>
+                    Agent spracuje všetky
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => handleBulkAction('assign')}>
+                    Priradiť
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => handleBulkAction('archive')}>
+                    Archivovať
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {emails.length > 0 && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground px-1">
+              <input
+                type="checkbox"
+                checked={selectedIds.size === emails.length}
+                onChange={selectAll}
+                className="w-4 h-4"
+              />
+              <span>Vybrať všetky</span>
+            </div>
+          )}
+
           {loading ? (
             <p className="text-center py-8 text-muted-foreground">Načítavam...</p>
           ) : emails.length === 0 ? (
@@ -348,30 +452,53 @@ Agent overil: Dodávateľ je evidovaný v registri, IČO a DIČ je správne`;
                 className={`cursor-pointer transition-colors ${
                   selectedEmail?.id === email.id ? 'ring-2 ring-primary' : 'hover:bg-accent/50'
                 }`}
-                onClick={() => {
-                  setSelectedEmail(email);
-                  setActionOutput(null);
-                }}
               >
                 <CardContent className="p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium truncate">{email.fromCompany || email.from}</p>
-                      <p className="text-sm text-muted-foreground truncate">{email.subject}</p>
+                  <div className="flex gap-3">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(email.id)}
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        toggleSelection(email.id);
+                      }}
+                      className="w-4 h-4 mt-1"
+                    />
+                    <div 
+                      className="flex-1 min-w-0"
+                      onClick={() => {
+                        setSelectedEmail(email);
+                        setActionOutput(null);
+                        setShowReplies(false);
+                      }}
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium truncate">{email.fromCompany || email.from}</p>
+                          <p className="text-sm text-muted-foreground truncate">{email.subject}</p>
+                        </div>
+                        {email.category && (
+                          <Badge variant={categoryColors[email.category] || 'default'} className="ml-2 shrink-0">
+                            {email.category}
+                          </Badge>
+                        )}
+                      </div>
+                      {email.id % 3 === 0 && (
+                        <div className="mb-2">
+                          <Badge variant="outline" className="text-xs bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/20">
+                            Agent rozpoznal: Podobný dopyt #{email.id - 10}
+                          </Badge>
+                        </div>
+                      )}
+                      <div className="flex justify-between items-center text-xs text-muted-foreground">
+                        <span>{formatDateTime(email.receivedAt)}</span>
+                        {email.aiConfidence && (
+                          <span className="text-muted-foreground">
+                            Agent kategorizoval: {email.aiConfidence}%
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    {email.category && (
-                      <Badge variant={categoryColors[email.category] || 'default'} className="ml-2 shrink-0">
-                        {email.category}
-                      </Badge>
-                    )}
-                  </div>
-                  <div className="flex justify-between items-center text-xs text-muted-foreground">
-                    <span>{formatDateTime(email.receivedAt)}</span>
-                    {email.aiConfidence && (
-                      <span className="text-muted-foreground">
-                        Agent kategorizoval: {email.aiConfidence}%
-                      </span>
-                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -452,6 +579,58 @@ Agent overil: Dodávateľ je evidovaný v registri, IČO a DIČ je správne`;
                       <Button size="sm" variant="outline">Upraviť</Button>
                       <Button size="sm" variant="outline">Exportovať PDF</Button>
                     </div>
+                  </div>
+                )}
+
+                {selectedEmail.category === 'dopyt' && (
+                  <div className="pt-4 border-t">
+                    <div className="flex items-center justify-between mb-3">
+                      <p className="text-sm font-medium">Agent navrhuje odpoveď:</p>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowReplies(!showReplies)}
+                      >
+                        {showReplies ? 'Skryť' : 'Zobraziť'}
+                      </Button>
+                    </div>
+                    {!showReplies ? (
+                      <div className="space-y-2">
+                        {smartReplies.map((reply, idx) => (
+                          <Card
+                            key={idx}
+                            className="p-3 cursor-pointer hover:bg-accent transition-colors"
+                            onClick={() => {
+                              setActionOutput(reply.full);
+                              setShowReplies(false);
+                            }}
+                          >
+                            <p className="text-sm font-medium mb-1">
+                              {reply.type === 'formal' && '📝 Formálna'}
+                              {reply.type === 'concise' && '⚡ Stručná'}
+                              {reply.type === 'detailed' && '📋 Podrobná'}
+                            </p>
+                            <p className="text-xs text-muted-foreground">{reply.preview}</p>
+                          </Card>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {smartReplies.map((reply, idx) => (
+                          <div key={idx} className="bg-muted/50 p-4 rounded-lg">
+                            <p className="text-sm font-medium mb-2">
+                              {reply.type === 'formal' && '📝 Formálna odpoveď'}
+                              {reply.type === 'concise' && '⚡ Stručná odpoveď'}
+                              {reply.type === 'detailed' && '📋 Podrobná odpoveď'}
+                            </p>
+                            <pre className="text-xs whitespace-pre-wrap mb-3">{reply.full}</pre>
+                            <Button size="sm" onClick={() => setActionOutput(reply.full)}>
+                              Použiť túto odpoveď
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
               </CardContent>

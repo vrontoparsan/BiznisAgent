@@ -6,6 +6,8 @@ import { formatCurrency } from '@/lib/utils';
 import { TrendingUp, Mail, FileText, DollarSign, AlertCircle, Settings2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { ConfigModal } from '../ConfigModal';
+import { ActivityFeed } from '../ActivityFeed';
+import { OnboardingChecklist } from '../OnboardingChecklist';
 
 export function Dashboard() {
   const { token } = useAuth();
@@ -143,88 +145,40 @@ export function Dashboard() {
         ))}
       </div>
 
+      <OnboardingChecklist />
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {config.chart_aktivita && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Posledné aktivity</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3 text-sm">
-                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                  <div className="w-2 h-2 rounded-full bg-primary mt-1.5" />
-                  <div className="flex-1">
-                    <p className="font-medium">
-                      <span className="text-primary">Agent vytvoril</span> cenovú ponuku CP-2026/0047
-                    </p>
-                    <p className="text-xs text-muted-foreground">Pre TechnoStav s.r.o. • pred 15 min</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                  <div className="w-2 h-2 rounded-full bg-blue-600 mt-1.5" />
-                  <div className="flex-1">
-                    <p className="font-medium">
-                      <span className="text-primary">Agent rozpoznal</span> nový dopyt
-                    </p>
-                    <p className="text-xs text-muted-foreground">Od BuildCom s.r.o. • pred 1 hod</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                  <div className="w-2 h-2 rounded-full bg-green-600 mt-1.5" />
-                  <div className="flex-1">
-                    <p className="font-medium">
-                      <span className="text-primary">Agent priradiľ</span> obchodnému zástupcovi
-                    </p>
-                    <p className="text-xs text-muted-foreground">Martin Novák • pred 2 hod</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                  <div className="w-2 h-2 rounded-full bg-purple-600 mt-1.5" />
-                  <div className="flex-1">
-                    <p className="font-medium">
-                      <span className="text-primary">Agent skontroloval</span> faktúru FA-2026/0088
-                    </p>
-                    <p className="text-xs text-muted-foreground">Všetko v poriadku ✓ • pred 3 hod</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        {config.chart_aktivita && <ActivityFeed limit={6} />}
 
         {config.chart_akcie && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Rýchle akcie</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <button className="w-full text-left px-4 py-3 rounded-lg hover:bg-accent text-sm transition-colors flex items-center justify-between group">
-                  <span>Nová cenová ponuka</span>
-                  <span className="text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                    Agent pomôže →
-                  </span>
-                </button>
-                <button className="w-full text-left px-4 py-3 rounded-lg hover:bg-accent text-sm transition-colors flex items-center justify-between group">
-                  <span>Pridať produkt</span>
-                  <span className="text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                    Agent extrahuje údaje →
-                  </span>
-                </button>
-                <button className="w-full text-left px-4 py-3 rounded-lg hover:bg-accent text-sm transition-colors flex items-center justify-between group">
-                  <span>Pridať zákazníka</span>
-                  <span className="text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                    Agent overí IČO →
-                  </span>
-                </button>
-                <button className="w-full text-left px-4 py-3 rounded-lg hover:bg-accent text-sm transition-colors flex items-center justify-between group">
-                  <span>Spracovať dopyty</span>
-                  <span className="text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                    Agent kategorizuje →
-                  </span>
-                </button>
-              </div>
-            </CardContent>
+          <Card className="p-6">
+            <h3 className="text-lg font-semibold mb-4">Rýchle akcie</h3>
+            <div className="space-y-2">
+              <button className="w-full text-left px-4 py-3 rounded-lg hover:bg-accent text-sm transition-colors flex items-center justify-between group">
+                <span>Nová cenová ponuka</span>
+                <span className="text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                  Agent pomôže →
+                </span>
+              </button>
+              <button className="w-full text-left px-4 py-3 rounded-lg hover:bg-accent text-sm transition-colors flex items-center justify-between group">
+                <span>Pridať produkt</span>
+                <span className="text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                  Agent extrahuje údaje →
+                </span>
+              </button>
+              <button className="w-full text-left px-4 py-3 rounded-lg hover:bg-accent text-sm transition-colors flex items-center justify-between group">
+                <span>Pridať zákazníka</span>
+                <span className="text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                  Agent overí IČO →
+                </span>
+              </button>
+              <button className="w-full text-left px-4 py-3 rounded-lg hover:bg-accent text-sm transition-colors flex items-center justify-between group">
+                <span>Spracovať dopyty</span>
+                <span className="text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                  Agent kategorizuje →
+                </span>
+              </button>
+            </div>
           </Card>
         )}
       </div>

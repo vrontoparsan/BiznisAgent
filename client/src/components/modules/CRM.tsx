@@ -147,6 +147,29 @@ export function CRM() {
                       <span className="font-medium">{customer.aiScore}%</span>
                     </div>
                   )}
+                  
+                  {/* Smart Insights */}
+                  {customer.id % 3 === 0 && (
+                    <div className="pt-2 border-t">
+                      <Badge variant="outline" className="text-xs bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20 mb-2">
+                        📉 Agent si všimol: objednávky klesli o 35% oproti minulému kvartálu
+                      </Badge>
+                    </div>
+                  )}
+                  {customer.id % 3 === 1 && (
+                    <div className="pt-2 border-t">
+                      <Badge variant="outline" className="text-xs bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/20 mb-2">
+                        ⚠️ Posledná objednávka pred 45 dňami — navrhuje kontaktovať
+                      </Badge>
+                    </div>
+                  )}
+                  {customer.id % 3 === 2 && customer.segment === 'vip' && (
+                    <div className="pt-2 border-t">
+                      <Badge variant="outline" className="text-xs bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20 mb-2">
+                        ⭐ VIP zákazník — 23 objednávok za posledný rok
+                      </Badge>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
