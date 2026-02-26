@@ -20,8 +20,10 @@ async function seed() {
 
   // Create users
   const hashedPassword = await bcrypt.hash('password123', 10);
+  const hashedSuperAdminPassword = await bcrypt.hash('superadmin123', 10);
   
-  const [admin, sales1, sales2, sales3, accountant] = await db.insert(schema.users).values([
+  const [superadmin, admin, sales1, sales2, sales3, accountant] = await db.insert(schema.users).values([
+    { email: 'superadmin@biznisagent.sk', passwordHash: hashedSuperAdminPassword, name: 'Juraj (Functu)', role: 'superadmin' },
     { email: 'admin@biznisagent.sk', passwordHash: hashedPassword, name: 'Peter Novák', role: 'admin' },
     { email: 'jana@biznisagent.sk', passwordHash: hashedPassword, name: 'Jana Kováčová', role: 'obchodnik' },
     { email: 'martin@biznisagent.sk', passwordHash: hashedPassword, name: 'Martin Horák', role: 'obchodnik' },
@@ -449,6 +451,7 @@ async function seed() {
 
   console.log('🎉 Seeding completed!');
   console.log('\n📝 Test credentials:');
+  console.log('   🛡️  Super Admin: superadmin@biznisagent.sk / superadmin123');
   console.log('   Admin: admin@biznisagent.sk / password123');
   console.log('   Sales: jana@biznisagent.sk / password123');
   console.log('   Accountant: eva@biznisagent.sk / password123');

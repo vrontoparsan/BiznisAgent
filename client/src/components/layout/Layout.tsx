@@ -7,15 +7,20 @@ import { CRM } from '../modules/CRM';
 import { Complaints } from '../modules/Complaints';
 import { Dashboard } from '../modules/Dashboard';
 import { Settings } from '../modules/Settings';
+import { SuperAdmin } from '../modules/SuperAdmin';
 import { NotificationBell } from './NotificationBell';
 import { GlobalSearch } from './GlobalSearch';
 import { KeyboardShortcuts } from './KeyboardShortcuts';
+import { useAuth } from '@/contexts/AuthContext';
 
 export function Layout() {
-  const [activeModule, setActiveModule] = useState('dashboard');
+  const { user } = useAuth();
+  const [activeModule, setActiveModule] = useState(user?.role === 'superadmin' ? 'superadmin' : 'dashboard');
 
   const renderModule = () => {
     switch (activeModule) {
+      case 'superadmin':
+        return <SuperAdmin />;
       case 'inbox':
         return <Inbox />;
       case 'documents':

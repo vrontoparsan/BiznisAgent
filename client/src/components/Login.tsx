@@ -72,9 +72,9 @@ export function Login() {
           </form>
           <div className="mt-6 p-4 rounded-lg bg-muted text-xs space-y-1">
             <p className="font-semibold">Demo účty:</p>
-            <p>Admin: admin@biznisagent.sk</p>
-            <p>Sales: jana@biznisagent.sk</p>
-            <p>Heslo: password123</p>
+            <p className="text-primary font-bold">🛡️ Super Admin: superadmin@biznisagent.sk / superadmin123</p>
+            <p>Admin: admin@biznisagent.sk / password123</p>
+            <p>Sales: jana@biznisagent.sk / password123</p>
           </div>
         </CardContent>
       </Card>
